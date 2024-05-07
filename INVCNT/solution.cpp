@@ -1,27 +1,44 @@
 #include <bits/stdc++.h>
+#define ll long long
 
 using namespace std;
 
-int merge(vector<int>&arr, int start, int mid, int end) {
+ll merge(vector<int>&arr, vector<int> &tmp, int start, int mid, int end) {
+    int i = start, j = mid+1, k = start;
+    ll count = 0;
 
-}
-
-int mergeSort(int start, int end, vector<int> &arr) {
-    if (start >= end) {
-        return 0;
+    while (i <= mid && j <= end) {
+        if (arr[i] <= arr[j]) {
+            tmp[k++] = arr[i++];
+        } else {
+                count += (mid - i + 1);
+            tmp[k++] = arr[j++];
+        }
     }
 
-    int mid = (start + end) >> 1;
-    int count = 0; 
-    count += mergeSort(start, mid, arr);
-    count += mergeSort(mid+1, end, arr);
-    count += merge(arr, start, mid, end);
+    while (i <= mid) tmp[k++] = arr[i++];
+
+    for (int i = start; i <= end; i++) arr[i] = tmp[i];
 
     return count;
 }
 
-int countInversions(vector<int> &arr, int n) {
-    return mergeSort(0, n-1, arr);
+ll mergeSort(int start, int end, vector<int> &arr, vector<int> &tmp) {
+    if (start == end) {
+        return 0;
+    }
+
+    int mid = (start + end) >> 1;
+    ll count = 0;
+    count += mergeSort(start, mid, arr, tmp);
+    count += mergeSort(mid+1, end, arr, tmp);
+    count += merge(arr, tmp, start, mid, end);
+
+    return count;
+}
+
+ll countInversions(vector<int> &arr, vector<int> &tmp, int n) {
+    return mergeSort(0, n-1, arr, tmp);
 }
 
 int main()
@@ -33,10 +50,13 @@ int main()
     int t; cin >> t;
     while (t--) {
         int n; cin >> n;
-        vector<int> arr(n);
-        for (int i = 0; i < n; i++) cin >> arr[i];
+        vector<int> arr(n), tmp(n);
+        for (int i = 0; i < n; i++) {
+            cin >> arr[i];
+            tmp[i] = arr[i];
+        }
 
-        cout << countInversions(arr, n) << '\n';
+        cout << countInversions(arr, tmp, n) << '\n';
     }
 
     return 0;
